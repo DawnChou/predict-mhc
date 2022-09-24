@@ -35,8 +35,8 @@ def truncate_hla(hla_genes, HLA_list, specific=['A', 'B']):
     '''
     truncate hla genes to num-I and transform them into labels
     '''
-    hla_labels = np.zeros(len(HLA_list))
-    hla_genes = []
+    input_labels = np.zeros(len(HLA_list))
+    gene_labels = []
     for hla in hla_genes:
         #if len(re.findall(r"\d+\:?\d*",hla)) ==5: #A*01:01
         #    hla_labels.append(HLA_list.index(hla.split(':')[0]))
@@ -51,14 +51,14 @@ def truncate_hla(hla_genes, HLA_list, specific=['A', 'B']):
             truncated = "B*15"
         if specific:
             if truncated[0] in specific:
-                hla_genes.append(HLA_list.index(truncated)) #A*01
+                gene_labels.append(HLA_list.index(truncated)) #A*01
         else:
-            hla_genes.append(HLA_list.index(truncated))
+            gene_labels.append(HLA_list.index(truncated))
     
     print(hla_genes)
-    hla_labels[hla_genes] = 1
+    input_labels[gene_labels] = 1
 
-    return hla_labels
+    return input_labels
 
 def get_features(aa_file):
     f_list = pd.read_csv(aa_file, sep='\t')
@@ -126,10 +126,10 @@ class build_dataset(data.Dataset):
 
 class build_amino_dataset(data.Dataset):
 
-    def __init__(self, subset_path, subset, specific=['A','B'], topk=100, HLA_list="datasets/Allelelist-ABC-num1.csv", aa_file="Data/AAidx_PCA.txt"):
+    def __init__(self, subset_path, subset, specific=['A','B'], topk=100, HLA_path="datasets/Allelelist-ABC-num1.csv", aa_file="Data/AAidx_PCA.txt"):
         
         datasets = np.load(subset_path, allow_pickle=True).item()
-        HLA_list = pd.read_csv(HLA_list).Allele.tolist()
+        HLA_list = pd.read_csv(HLA_path).Allele.tolist()
         self.HLA_list = [gene for gene in HLA_list if gene[0] in specific]
 
         aa_dict = get_features(aa_file)
